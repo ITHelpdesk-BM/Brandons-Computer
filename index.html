@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Brandon's Enterprise NOC</title>
+    <style>
+        /* NOC-Style Dark Theme */
+        body { background: #050505; color: #00ff00; font-family: 'Courier New', monospace; padding: 20px; }
+        h1 { border-bottom: 2px solid #00ff00; padding-bottom: 10px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
+        
+        .card { 
+            border: 1px solid #333; padding: 15px; background: #111; 
+            cursor: pointer; transition: 0.3s; text-align: center;
+        }
+        .card:hover { border-color: #00ff00; background: #1a1a1a; }
+        
+        /* Critical State Styling */
+        .fault { 
+            border: 2px solid #ff0000; background: #220000; 
+            color: #ff0000; animation: blink 1s infinite; 
+        }
+        @keyframes blink { 50% { opacity: 0.6; } }
+        
+        #log { margin-top: 30px; border-top: 1px solid #333; padding-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Enterprise ITSM Simulator</h1>
+    <div id="device-grid" class="grid"></div>
+    
+    <div id="log">
+        <h3>System Event Log</h3>
+        <ul id="event-list"><li>System monitoring active...</li></ul>
+    </div>
+
+    <script>
+        // 1. Database of IT Scenarios
+        const scenarios = [
+            { issue: 'PSU Failure', cause: 'Voltage spike detected', sol: 'Replace PSU unit' },
+            { issue: 'Disk I/O Error', cause: 'Bad sectors on HDD', sol: 'Reimage & replace drive' },
+            { issue: 'Network Timeout', cause: 'DNS misconfiguration', sol: 'Flush DNS & reset NIC' },
+            { issue: 'Thermal Fault', cause: 'Fan failure', sol: 'Clean heatsink & replace fan' }
+        ];
+
+        // 2. Initialize 14 Devices
+        const devices = Array.from({length: 12}, (_, i) => `PC-${i+1}`).concat(['SERVER-1', 'NETWORK-CORE']);
+        let state = devices.map(id => ({ id, status: 'Online', incident: null }));
+
+        // 3. Logic to Resolve Incident
+        function dispatch(id) {
+            const d = state.find(s => s.id === id);
+            if (!d.incident) return;
+            
+            alert(`--- TICKET DISPATCHED: ${d.id} ---\nRoot Cause: ${d.incident.cause}\nResolution: ${d.incident.sol}\n\nTechnician dispatched to site.`);
+            
+            d.status = 'REPAIRING...';
+            updateUI();
+            
+            setTimeout(() => {
+                d.status = 'Online';
+                d.incident = null;
+                updateUI();
+            }, 3000);
+        }
+
+        // 4. Update UI
+        function updateUI() {
+            const grid = document.getElementById('device-grid');
+            grid.innerHTML = state.map(d => `
+                <div class="card ${d.incident ? 'fault' : ''}" onclick="dispatch('${d.id}')">
+                    <strong>${d.id}</strong><br>
+                    ${d.incident ? 'CRITICAL' : 'Stable'}
+                </div>
+            `).join('');
+        }
+
+        // 5. Randomly Inject Incidents
+        setInterval(() => {
+            const d = state[Math.floor(Math.random() * state.length)];
+            if (!d.incident) {
+                d.incident = scenarios[Math.floor(Math.random() * scenarios.length)];
+                updateUI();
+            }
+        }, 3000);
+
+        updateUI();
+    </script>
+</body>
+</html>

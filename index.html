@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { background: #0f0f0f; color: #00ff00; font-family: monospace; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .card { border: 2px solid #007bff; padding: 20px; }
+        .critical { border-color: #ff0000; background: #330000; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; color: white; }
+        th, td { border: 1px solid #444; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Brandon's ITSM Dashboard</h1>
+    <div class="grid">
+        <div id="CPU" class="card">CPU Load: <span id="cpu-val">20%</span></div>
+        <div id="RAM" class="card">RAM Usage: <span id="ram-val">45%</span></div>
+        <div id="PDU" class="card">PDU Status: <span id="pdu-val">Online</span></div>
+    </div>
+    <table id="ticket-table">
+        <tr><th>Ticket ID</th><th>Service</th><th>Status</th></tr>
+    </table>
+
+    <script>
+        // Start the logic immediately when the page loads
+        console.log("System Engine Starting...");
+        
+        // 1. Simulate changing numbers
+        setInterval(() => {
+            document.getElementById('cpu-val').innerText = Math.floor(Math.random() * 100) + "%";
+        }, 2000);
+
+        // 2. Simulate a ticket appearing
+        setInterval(() => {
+            const table = document.getElementById('ticket-table');
+            const row = table.insertRow(-1);
+            row.innerHTML = `<td>TKT-${Math.floor(Math.random()*999)}</td><td>DSI</td><td>Dispatched</td>`;
+            document.getElementById('CPU').classList.add('critical');
+        }, 5000);
+    </script>
+</body>
+</html>

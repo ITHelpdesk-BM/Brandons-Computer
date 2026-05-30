@@ -1,0 +1,5 @@
+body { background: #1a1a1a; color: white; font-family: monospace; }
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.card { border: 2px solid blue; padding: 20px; }
+.status-critical { border-color: red; background: #400; }
+#log-panel { height: 150px; overflow-y: scroll; border: 1px solid #444; }

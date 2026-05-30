@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Brandon's ITSM Dashboard</title>
+    <style>
+        body { background: #0a0a0a; color: #00ff00; font-family: 'Courier New', monospace; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .card { border: 1px solid #333; padding: 15px; cursor: pointer; transition: 0.3s; }
+        .card:hover { border-color: #00ff00; }
+        .fault { border: 2px solid #ff0000; background: #220000; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; color: #fff; }
+        th, td { border: 1px solid #444; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Brandon's Enterprise NOC</h1>
+    <div id="device-grid" class="grid"></div>
+    <h3>Live Dispatch Queue</h3>
+    <table id="tickets"><tr><th>ID</th><th>Device</th><th>Technician</th><th>Status</th></tr></table>
+
+    <script>
+        const devices = Array.from({length: 12}, (_, i) => `PC-${i+1}`).concat(['SERVER-1', 'NETWORK-CORE']);
+        let state = devices.map(id => ({ id, status: 'Online', incident: null }));
+
+        function update() {
+            const grid = document.getElementById('device-grid');
+            grid.innerHTML = state.map(d => `
+                <div class="card ${d.incident ? 'fault' : ''}" onclick="dispatch('${d.id}')">
+                    <strong>${d.id}</strong><br>${d.status}
+                </div>
+            `).join('');
+        }
+
+        function dispatch(id) {
+            const d = state.find(s => s.id === id);
+            if (!d.incident) return;
+            d.status = 'DISPATCHED';
+            update();
+            setTimeout(() => { d.status = 'Online'; d.incident = null; update(); }, 3000);
+        }
+
+        setInterval(() => {
+            const d = state[Math.floor(Math.random() * state.length)];
+            if (!d.incident) { d.incident = 'FAULT'; d.status = 'CRITICAL'; update(); }
+        }, 3000);
+        update();
+    </script>
+</body>
+</html>
